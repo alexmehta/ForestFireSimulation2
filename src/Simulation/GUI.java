@@ -16,8 +16,8 @@ public class GUI extends PApplet {
 
     public void setup() {
         // Create a simulator
-        sim = new Simulator(10, 10, 0.75);
-        sim.initialize();
+        sim = new Simulator(100, 100);
+        sim.justTreeInit(1);
 //        sim.justTreeInit();
         // Create the display
         // parameters: (10,10) is upper left of display
@@ -37,7 +37,7 @@ public class GUI extends PApplet {
         display.setColor(Simulator.GREEN, green);          // 1 displays as green
         display.setColor(Simulator.RED, red);            // 2 displays as red
         display.setColor(Simulator.GREY, grey);           // 3 displays as grey
-        display.setColor(Simulator.WHITE, white);          // 0 displays as white
+        display.setColor(Simulator.PLAIN, white);          // 0 displays as white
         display.setColor(Simulator.BUSH, brown);
         display.setColor(Simulator.CYPRESS, lightGreen);
         background(200);

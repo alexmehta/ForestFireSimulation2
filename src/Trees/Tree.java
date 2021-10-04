@@ -8,7 +8,7 @@ public class Tree {
 
     public Tree(int time) {
         this.time = time;
-        this.condition = Simulator.WHITE;
+        this.condition = Simulator.PLAIN;
     }
 
     public Tree(int time, int condition) {

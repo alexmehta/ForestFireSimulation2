@@ -17,11 +17,11 @@ public class MonteCarloOutput {
         PrintWriter fout = new PrintWriter(new OutputStreamWriter(new FileOutputStream("output.csv")));
         fout.println("percent, burned");
         for (int i = 1; i <= 100; i++) {
-            String msg = i + "%, ";
+            String msg = i + ", ";
             fout.print(msg);
             fout.printf("%f\n", (runTest((double) i / 100)));
-//            System.out.println((double)i/100);
-//            System.out.println(i + "%, " + runTest((double) i/100));
+            fout.flush();
+
         }
         fout.close();
     }
@@ -35,8 +35,8 @@ public class MonteCarloOutput {
     }
 
     private static double runSingleFire(double i) {
-        Simulator simulator = new Simulator(100, 100, i);
-        simulator.initializeWBushes();
+        Simulator simulator = new Simulator(100, 100);
+        simulator.initJustCypress(i);
         while (simulator.isBurnable()) {
             simulator.propagateFire();
         }

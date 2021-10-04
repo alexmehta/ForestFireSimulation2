@@ -12,7 +12,7 @@ public class Simulator {
 
     public static final int GREEN = 1;
     public static final int RED = 2;
-    public static final int WHITE = 0;
+    public static final int PLAIN = 0;
     public static final int GREY = 3;
     public static final int BUSH = 5;
     public static final int CYPRESS = 4;
@@ -20,23 +20,21 @@ public class Simulator {
     final int R;
     final int C;
     public ArrayList<MediterraneanCypress> inBurn = new ArrayList<>();
-    double treeDensity;
-    Tree[][] Forest;
-    Tree[][] refForest;
+    Tree[][] forest;
+    Tree[][] forestCopy;
+
     /**
      * Sets nearby trees on fire for one step. Makes copy of array in order to prevent all trees igniting in same time step
      **/
-    int t = 0;
 
 
-    public Simulator(int r, int c, double treeDensity) {
+    public Simulator(int r, int c) {
         this.R = r;
         this.C = c;
-        this.Forest = new Tree[this.R][this.C];
-        this.treeDensity = treeDensity;
+        this.forest = new Tree[this.R][this.C];
     }
 
-    public void justTreeInit() {
+    public void justTreeInit(double treeDensity) {
         int totalForests = (int) (treeDensity * (R * C)) - 1;
         ArrayList<Integer> array = new ArrayList<>();
         for (int i = 0; i < R * C; i++) {
@@ -44,7 +42,7 @@ public class Simulator {
                 totalForests--;
                 array.add(GREEN);
             } else {
-                array.add(WHITE);
+                array.add(PLAIN);
             }
         }
         Collections.shuffle(array);
@@ -52,10 +50,30 @@ public class Simulator {
         int rows = (int) (Math.random() * R);
         int col = (int) (Math.random() * C);
 //        System.out.println(col + " " + rows);
-        this.Forest[rows][col] = new Tree(0, RED);
+        this.forest[rows][col] = new Tree(0, RED);
     }
 
-    public void initializeWBushes() {
+    public void initJustCypress(double treeDensity) {
+        int totalForests = (int) (treeDensity * (R * C)) - 1;
+        ArrayList<Integer> array = new ArrayList<>();
+        for (int i = 0; i < R * C; i++) {
+            if (totalForests >= 0) {
+                totalForests--;
+                double chance = Math.random();
+                array.add(CYPRESS);
+            } else {
+                array.add(PLAIN);
+            }
+        }
+        Collections.shuffle(array);
+        fillGrid(array);
+        int rows = (int) (Math.random() * R);
+        int col = (int) (Math.random() * C);
+//        System.out.println(col + " " + rows);
+        this.forest[rows][col] = new Tree(0, RED);
+    }
+
+    public void initializeWBushes(double treeDensity) {
         int totalForests = (int) (treeDensity * (R * C)) - 1;
         ArrayList<Integer> array = new ArrayList<>();
         for (int i = 0; i < R * C; i++) {
@@ -69,7 +87,7 @@ public class Simulator {
                     array.add(BUSH);
                 }
             } else {
-                array.add(WHITE);
+                array.add(PLAIN);
             }
         }
         Collections.shuffle(array);
@@ -77,10 +95,10 @@ public class Simulator {
         int rows = (int) (Math.random() * R);
         int col = (int) (Math.random() * C);
 //        System.out.println(col + " " + rows);
-        this.Forest[rows][col] = new Tree(0, RED);
+        this.forest[rows][col] = new Tree(0, RED);
     }
 
-    public void initialize() {
+    public void initialize(double treeDensity) {
         int totalForests = (int) (treeDensity * (R * C)) - 1;
         ArrayList<Integer> array = new ArrayList<>();
         for (int i = 0; i < R * C; i++) {
@@ -96,7 +114,7 @@ public class Simulator {
                     array.add(BUSH);
                 }
             } else {
-                array.add(WHITE);
+                array.add(PLAIN);
             }
         }
         Collections.shuffle(array);
@@ -104,23 +122,23 @@ public class Simulator {
         int rows = (int) (Math.random() * R);
         int col = (int) (Math.random() * C);
 //        System.out.println(col + " " + rows);
-        this.Forest[rows][col] = new Tree(0, RED);
+        this.forest[rows][col] = new Tree(0, RED);
     }
 
     private void fillGrid(ArrayList<Integer> array) {
         int count = 0;
-        for (int i = 0; i < this.Forest.length; i++) {
-            for (int j = 0; j < this.Forest[0].length; j++) {
+        for (int i = 0; i < this.forest.length; i++) {
+            for (int j = 0; j < this.forest[0].length; j++) {
                 if (array.get(count) != 5 && array.get(count) != CYPRESS) {
-                    this.Forest[i][j] = new Tree(0, array.get(count));
+                    this.forest[i][j] = new Tree(0, array.get(count));
                 }
                 //cypress
                 else if (array.get(count) == 4) {
-                    this.Forest[i][j] = new MediterraneanCypress(0);
+                    this.forest[i][j] = new MediterraneanCypress(0);
                 }
                 //bush
                 else {
-                    this.Forest[i][j] = new Bush(0);
+                    this.forest[i][j] = new Bush(0);
                 }
                 count++;
             }
@@ -128,27 +146,27 @@ public class Simulator {
     }
 
     public void setFire(int r, int c) {
-        if (this.Forest[r][c] instanceof Bush && Math.random() > ((Bush) this.Forest[r][c]).getMoisture()) {
-            this.Forest[r][c] = new Bush(0, RED, 0);
+        if (this.forest[r][c] instanceof Bush && Math.random() > ((Bush) this.forest[r][c]).getMoisture()) {
+            this.forest[r][c] = new Bush(0, RED, 0);
 
-        } else if (this.Forest[r][c] instanceof MediterraneanCypress && Math.random() > ((MediterraneanCypress) this.Forest[r][c]).chance) {
-            ((MediterraneanCypress) this.Forest[r][c]).setFire(this);
+        } else if (this.forest[r][c] instanceof MediterraneanCypress && Math.random() > ((MediterraneanCypress) this.forest[r][c]).chance) {
+            ((MediterraneanCypress) this.forest[r][c]).setFire(this);
         } else if (1 - spreadRate < Math.random()) {
-            this.Forest[r][c] = new Tree(0, RED);
+            this.forest[r][c] = new Tree(0, RED);
         }
 
     }
 
     public void propagateFire() {
-        this.refForest = arrayCopy(Forest);
-        for (int y = 0; y < this.refForest.length; y++) {
-            for (int x = 0; x < this.refForest[y].length; x++) {
-                if (this.refForest[y][x].getCondition() == RED) {
+        this.forestCopy = arrayCopy(forest);
+        for (int y = 0; y < this.forestCopy.length; y++) {
+            for (int x = 0; x < this.forestCopy[y].length; x++) {
+                if (this.forestCopy[y][x].getCondition() == RED) {
                     setNearbyTrees(x, y);
-                    this.Forest[y][x].incrementTime();
+                    this.forest[y][x].incrementTime();
                 }
-                if (this.refForest[y][x].getTime() >= 1) {
-                    this.Forest[y][x].setAsh();
+                if (this.forestCopy[y][x].getTime() >= 1) {
+                    this.forest[y][x].setAsh();
                 }
             }
         }
@@ -167,19 +185,16 @@ public class Simulator {
     }
 
     private void setNearbyTrees(int x, int y) {
-        t++;
         for (int r = y - 1; r <= y + 1; r++) {
             for (int c = x - 1; c <= x + 1; c++) {
                 try {
-                    if (this.refForest[r][c].getCondition() == GREEN) {
+                    if (this.forestCopy[r][c].getCondition() == GREEN) {
                         setFire(r, c);
-                    } else if (this.refForest[r][c].getCondition() == BUSH && this.refForest[r][c] instanceof Bush && this.refForest[r][c].getCondition() != RED) {
-                        //separate setfire with diff probability
-//                       if (t==1)System.out.println(c + " ," + r + "\t set off by " + this.refForest[y][x] + " at " + x + ", " + y) ;
-                            setFire(r, c);
+                    } else if (this.forestCopy[r][c].getCondition() == BUSH && this.forestCopy[r][c] instanceof Bush && this.forestCopy[r][c].getCondition() != RED) {
+                        setFire(r, c);
 
-                    } else if (this.refForest[r][c].getCondition() == CYPRESS && this.refForest[r][c] instanceof MediterraneanCypress && this.refForest[r][c].getCondition() != RED) {
-                        if (Math.random() > ((MediterraneanCypress) this.refForest[r][c]).chance)
+                    } else if (this.forestCopy[r][c].getCondition() == CYPRESS && this.forestCopy[r][c] instanceof MediterraneanCypress && this.forestCopy[r][c].getCondition() != RED) {
+                        if (Math.random() > ((MediterraneanCypress) this.forestCopy[r][c]).chance)
                             setFire(r, c);
                     }
                 } catch (ArrayIndexOutOfBoundsException ignored) {
@@ -190,10 +205,10 @@ public class Simulator {
 
     //continues while there is a tree that could be burned
     public boolean isBurnable() {
-        this.refForest = arrayCopy(this.Forest);
-        for (int y = 0; y < this.Forest.length; y++) {
-            for (int x = 0; x < this.Forest[0].length; x++) {
-                if (this.Forest[y][x].getCondition() == GREEN && burnNearby(y, x)) {
+        this.forestCopy = arrayCopy(this.forest);
+        for (int y = 0; y < this.forest.length; y++) {
+            for (int x = 0; x < this.forest[0].length; x++) {
+                if (this.forest[y][x].getCondition() == GREEN && burnNearby(y, x)) {
                     return true;
                 }
             }
@@ -205,7 +220,7 @@ public class Simulator {
         for (int j = y - 1; j <= y + 1; j++) {
             for (int i = x - 1; i <= x + 1; i++) {
                 try {
-                    if (this.refForest[j][i].getCondition() == RED) {
+                    if (this.forestCopy[j][i].getCondition() == RED) {
                         return true;
                     }
                 } catch (ArrayIndexOutOfBoundsException ignored) {
@@ -218,18 +233,18 @@ public class Simulator {
     }
 
     public int getWidth() {
-        return this.Forest[0].length;
+        return this.forest[0].length;
     }
 
     public int getHeight() {
-        return this.Forest.length;
+        return this.forest.length;
     }
 
     public int[][] getDisplayGrid() {
         int[][] display = new int[this.getHeight()][this.getWidth()];
         for (int i = 0; i < display.length; i++) {
             for (int j = 0; j < display[0].length; j++) {
-                display[i][j] = this.Forest[i][j].getCondition();
+                display[i][j] = this.forest[i][j].getCondition();
             }
         }
         return display;
@@ -240,9 +255,10 @@ public class Simulator {
         int alive = 0;
         for (int j = 0; j < this.getHeight(); j++) {
             for (int i = 0; i < this.getWidth(); i++) {
-                if (this.Forest[j][i].getCondition() == GREY) {
+                if (this.forest[j][i].getCondition() == GREY) {
                     burned++;
-                } else if (this.Forest[j][i].getCondition() == GREEN) alive++;
+                } else if (this.forest[j][i].getCondition() == GREEN || this.forest[j][i].getCondition() == BUSH || this.forest[j][i].getCondition() == CYPRESS)
+                    alive++;
             }
         }
         return (double) burned / (alive + burned);
