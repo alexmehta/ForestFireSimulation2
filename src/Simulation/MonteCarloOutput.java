@@ -36,7 +36,7 @@ public class MonteCarloOutput {
 
     private static double runSingleFire(double i) {
         Simulator simulator = new Simulator(100, 100);
-        simulator.initJustCypress(i);
+        simulator.initialize(i);
         while (simulator.isBurnable()) {
             simulator.propagateFire();
         }

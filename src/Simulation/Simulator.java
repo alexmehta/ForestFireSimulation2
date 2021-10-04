@@ -149,7 +149,7 @@ public class Simulator {
         if (this.forest[r][c] instanceof Bush && Math.random() > ((Bush) this.forest[r][c]).getMoisture()) {
             this.forest[r][c] = new Bush(0, RED, 0);
 
-        } else if (this.forest[r][c] instanceof MediterraneanCypress && Math.random() > ((MediterraneanCypress) this.forest[r][c]).chance) {
+        } else if (this.forest[r][c] instanceof MediterraneanCypress) {
             ((MediterraneanCypress) this.forest[r][c]).setFire(this);
         } else if (1 - spreadRate < Math.random()) {
             this.forest[r][c] = new Tree(0, RED);
