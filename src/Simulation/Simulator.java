@@ -17,6 +17,7 @@ public class Simulator {
     public static final int BUSH = 5;
     public static final int CYPRESS = 4;
     static final double spreadRate = 0.5;
+    static final int CYPRESSTIME = 7;
     final int R;
     final int C;
     public ArrayList<MediterraneanCypress> inBurn = new ArrayList<>();
@@ -49,7 +50,6 @@ public class Simulator {
         fillGrid(array);
         int rows = (int) (Math.random() * R);
         int col = (int) (Math.random() * C);
-//        System.out.println(col + " " + rows);
         this.forest[rows][col] = new Tree(0, RED);
     }
 
@@ -59,7 +59,6 @@ public class Simulator {
         for (int i = 0; i < R * C; i++) {
             if (totalForests >= 0) {
                 totalForests--;
-                double chance = Math.random();
                 array.add(CYPRESS);
             } else {
                 array.add(PLAIN);
@@ -69,7 +68,6 @@ public class Simulator {
         fillGrid(array);
         int rows = (int) (Math.random() * R);
         int col = (int) (Math.random() * C);
-//        System.out.println(col + " " + rows);
         this.forest[rows][col] = new Tree(0, RED);
     }
 
@@ -94,7 +92,6 @@ public class Simulator {
         fillGrid(array);
         int rows = (int) (Math.random() * R);
         int col = (int) (Math.random() * C);
-//        System.out.println(col + " " + rows);
         this.forest[rows][col] = new Tree(0, RED);
     }
 
@@ -121,7 +118,6 @@ public class Simulator {
         fillGrid(array);
         int rows = (int) (Math.random() * R);
         int col = (int) (Math.random() * C);
-//        System.out.println(col + " " + rows);
         this.forest[rows][col] = new Tree(0, RED);
     }
 
@@ -172,7 +168,7 @@ public class Simulator {
         }
         for (int i = 0; i < inBurn.size(); i++) {
             inBurn.get(i).incrementTime();
-            if (inBurn.get(i).getTime() == 7) inBurn.get(i).ignite();
+            if (inBurn.get(i).getTime() == CYPRESSTIME) inBurn.get(i).ignite();
         }
     }
 
@@ -182,6 +178,10 @@ public class Simulator {
             copy[i] = Arrays.copyOf(forest[i], forest[i].length);
         }
         return copy;
+    }
+
+    private boolean outofBounds(int x, int y) {
+        return x >= 0 && y >= 0 && x < this.forest[0].length && y < this.forest.length;
     }
 
     private void setNearbyTrees(int x, int y) {
