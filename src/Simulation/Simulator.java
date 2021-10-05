@@ -144,13 +144,11 @@ public class Simulator {
     public void setFire(int r, int c) {
         if (this.forest[r][c] instanceof Bush && Math.random() > ((Bush) this.forest[r][c]).getMoisture()) {
             this.forest[r][c] = new Bush(0, RED, 0);
-
         } else if (this.forest[r][c] instanceof MediterraneanCypress) {
             ((MediterraneanCypress) this.forest[r][c]).setFire(this);
-        } else if (1 - spreadRate < Math.random()) {
+        } else if (spreadRate > Math.random()) {
             this.forest[r][c] = new Tree(0, RED);
         }
-
     }
 
     public void propagateFire() {
@@ -166,9 +164,9 @@ public class Simulator {
                 }
             }
         }
-        for (int i = 0; i < inBurn.size(); i++) {
-            inBurn.get(i).incrementTime();
-            if (inBurn.get(i).getTime() == CYPRESSTIME) inBurn.get(i).ignite();
+        for (MediterraneanCypress mediterraneanCypress : inBurn) {
+            mediterraneanCypress.incrementTime();
+            if (mediterraneanCypress.getTime() == CYPRESSTIME) mediterraneanCypress.ignite();
         }
     }
 
@@ -180,22 +178,21 @@ public class Simulator {
         return copy;
     }
 
-    private boolean inBounds(int x, int y) {
-        return x >= 0 && y >= 0 && x < this.forest[0].length && y < this.forest.length;
+    private boolean outOfBounds(int x, int y) {
+        return x < 0 || y < 0 || x >= this.forest[0].length || y >= this.forest.length;
     }
 
     private void setNearbyTrees(int x, int y) {
         for (int r = y - 1; r <= y + 1; r++) {
             for (int c = x - 1; c <= x + 1; c++) {
-                if (!inBounds(c, r)) continue;
+                if (outOfBounds(c, r)) continue;
                 if (this.forestCopy[r][c].getCondition() == GREEN) {
                     setFire(r, c);
-                } else if (this.forestCopy[r][c].getCondition() == BUSH && this.forestCopy[r][c] instanceof Bush && this.forestCopy[r][c].getCondition() != RED) {
+                } else if (this.forestCopy[r][c] instanceof Bush && this.forestCopy[r][c].getCondition() != RED && this.forestCopy[r][c].getCondition() == BUSH) {
                     setFire(r, c);
 
-                } else if (this.forestCopy[r][c].getCondition() == CYPRESS && this.forestCopy[r][c] instanceof MediterraneanCypress && this.forestCopy[r][c].getCondition() != RED) {
-                    if (Math.random() > ((MediterraneanCypress) this.forestCopy[r][c]).chance)
-                        setFire(r, c);
+                } else if (this.forestCopy[r][c] instanceof MediterraneanCypress && this.forestCopy[r][c].getCondition() == CYPRESS && this.forestCopy[r][c].getCondition() != RED) {
+                    if (Math.random() > ((MediterraneanCypress) this.forestCopy[r][c]).chance) setFire(r, c);
                 }
 
             }
@@ -218,7 +215,7 @@ public class Simulator {
     private boolean burnNearby(int y, int x) {
         for (int j = y - 1; j <= y + 1; j++) {
             for (int i = x - 1; i <= x + 1; i++) {
-                if (!inBounds(i,j)) continue;
+                if (outOfBounds(i, j)) continue;
                 if (this.forestCopy[j][i].getCondition() == RED) {
                     return true;
                 }
