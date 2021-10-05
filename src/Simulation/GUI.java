@@ -25,7 +25,7 @@ public class GUI extends PApplet {
         display = new DisplayWindow(this, 10, 10, 620, 530);
         display.setNumCols(sim.getWidth());        // NOTE:  these must match your simulator!!
         display.setNumRows(sim.getHeight());
-        frameRate(1);
+        frameRate(144);
         // Set different grid values to different colors
         int red = color(255, 0, 0);          // pattern:  color(redAmount, greenAmount, blueAmount)
         int grey = color(180, 180, 180);

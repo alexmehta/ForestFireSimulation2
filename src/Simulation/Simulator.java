@@ -180,25 +180,24 @@ public class Simulator {
         return copy;
     }
 
-    private boolean outofBounds(int x, int y) {
+    private boolean inBounds(int x, int y) {
         return x >= 0 && y >= 0 && x < this.forest[0].length && y < this.forest.length;
     }
 
     private void setNearbyTrees(int x, int y) {
         for (int r = y - 1; r <= y + 1; r++) {
             for (int c = x - 1; c <= x + 1; c++) {
-                try {
-                    if (this.forestCopy[r][c].getCondition() == GREEN) {
-                        setFire(r, c);
-                    } else if (this.forestCopy[r][c].getCondition() == BUSH && this.forestCopy[r][c] instanceof Bush && this.forestCopy[r][c].getCondition() != RED) {
-                        setFire(r, c);
+                if (!inBounds(c, r)) continue;
+                if (this.forestCopy[r][c].getCondition() == GREEN) {
+                    setFire(r, c);
+                } else if (this.forestCopy[r][c].getCondition() == BUSH && this.forestCopy[r][c] instanceof Bush && this.forestCopy[r][c].getCondition() != RED) {
+                    setFire(r, c);
 
-                    } else if (this.forestCopy[r][c].getCondition() == CYPRESS && this.forestCopy[r][c] instanceof MediterraneanCypress && this.forestCopy[r][c].getCondition() != RED) {
-                        if (Math.random() > ((MediterraneanCypress) this.forestCopy[r][c]).chance)
-                            setFire(r, c);
-                    }
-                } catch (ArrayIndexOutOfBoundsException ignored) {
+                } else if (this.forestCopy[r][c].getCondition() == CYPRESS && this.forestCopy[r][c] instanceof MediterraneanCypress && this.forestCopy[r][c].getCondition() != RED) {
+                    if (Math.random() > ((MediterraneanCypress) this.forestCopy[r][c]).chance)
+                        setFire(r, c);
                 }
+
             }
         }
     }
@@ -219,11 +218,9 @@ public class Simulator {
     private boolean burnNearby(int y, int x) {
         for (int j = y - 1; j <= y + 1; j++) {
             for (int i = x - 1; i <= x + 1; i++) {
-                try {
-                    if (this.forestCopy[j][i].getCondition() == RED) {
-                        return true;
-                    }
-                } catch (ArrayIndexOutOfBoundsException ignored) {
+                if (!inBounds(i,j)) continue;
+                if (this.forestCopy[j][i].getCondition() == RED) {
+                    return true;
                 }
 
             }
